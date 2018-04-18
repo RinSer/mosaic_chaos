@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Mosaic chaos</title>
+
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+
+            .square {
+                box-sizing: border-box;
+                float: left;
+            }
+        </style>
+    </head>
+
+    <body>
+        <script src="hammer.min.js"></script>
+        <script>
+            (function() {
+
+                function draw(event) {
+                    if (event && event.target) {
+                        let clientX = event.clientX || event.srcEvent && event.srcEvent.clientX;
+                        let clientY = event.clientY || event.srcEvent && event.srcEvent.clientY;
+                        let x = clientX - event.target.offsetLeft - Math.ceil(0.5*event.target.offsetWidth);
+                        let y = clientY - event.target.offsetTop - Math.ceil(0.5*event.target.offsetHeight);
+                        
+                        if (x > 0 && y > 0) {
+                            if (x > y)
+                                event.target.style.borderRightColor = randomColor();
+                            else
+                                event.target.style.borderBottomColor = randomColor();
+                        }
+                        
+                        if (x < 0 && y > 0) {
+                            if (Math.abs(x) > y)
+                                event.target.style.borderLeftColor = randomColor();
+                            else
+                                event.target.style.borderBottomColor = randomColor();
+                        }
+
+                        if (x > 0 && y < 0) {
+                            if (x > Math.abs(y))
+                                event.target.style.borderRightColor = randomColor();
+                            else
+                                event.target.style.borderTopColor = randomColor();
+                        }
+
+                        if (x < 0 && y < 0) {
+                            if (Math.abs(x) > Math.abs(y))
+                                event.target.style.borderLeftColor = randomColor();
+                            else
+                                event.target.style.borderTopColor = randomColor();
+                        }
+                    }
+                }
+
+                function randomColor() {
+                    let chars = '0123456789ABCDEF';
+                    
+                    let color = '#';
+                    for (var i = 0; i < 6; i++)
+                        color += chars[Math.floor(Math.random()*chars.length)];
+                    
+                    return color;
+                }
+
+                function main() {
+                    let borderWidth = 2;
+                    let numberOfSquares = (100/(2 * borderWidth)) * Math.ceil(window.innerHeight / (0.02 * borderWidth * window.innerWidth));
+                    for (var i = 0; i < numberOfSquares; i++) {
+                        let square = document.createElement('DIV');
+                        square.className = 'square';
+                        square.style.width = 2 * borderWidth + 'vw';
+                        square.style.height = 2 * borderWidth + 'vw';
+                        square.style.border = borderWidth + 'vw solid white';
+                        square.addEventListener('mousemove', draw);
+
+                        let drawHammer = new Hammer(square, {touchAction: 'auto' });
+                        drawHammer.on('tap', draw);
+
+                        document.body.appendChild(square);
+                    }
+                }
+
+                window.addEventListener('load', main);
+            })();
+        </script>
+    </body>
+
+</html>
